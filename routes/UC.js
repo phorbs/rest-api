@@ -14,13 +14,13 @@ router.post('/add', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('INSERT INTO ucs SET ?', uc, function (err, result) {
-                if (err) return res.status(500).send("Erro ao registar");
-                res.status(200).send('Unidade ' + uc.unidadeCurricular + ' registada');
+                if (err) return res.status(500).send({ message: "Erro ao registar" });
+                res.status(200).send({ message: 'Unidade ' + uc.unidadeCurricular + ' registada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -29,13 +29,13 @@ router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
             conn.query('select * from ucs order by iduc desc', function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -44,9 +44,9 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
             conn.query('select * from ucs where iduc = ?', req.params.id, function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
-                    return res.status(404).send("UC não encontrada");
+                    return res.status(404).send({ message: "UC não encontrada" });
                 } else {
                     res.status(200).send(rows);
                 }
@@ -54,7 +54,7 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -67,13 +67,13 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('update ucs set ? where iduc = ?', [uc, uc.iduc], function (err, result) {
-                if (err) return res.status(500).send("Erro ao registar");
-                res.status(200).send('Unidade ' + uc.unidadeCurricular + ' atualizada');
+                if (err) return res.status(500).send({ message: "Erro ao registar" });
+                res.status(200).send({ message: 'Unidade ' + uc.unidadeCurricular + ' atualizada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -85,13 +85,13 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('delete from ucs where iduc = ?', uc.iduc, function (err, result) {
-                if (err) return res.status(500).send("Erro ao eliminar");
-                res.status(200).send('Unidade eliminada');
+                if (err) return res.status(500).send({ message: "Erro ao eliminar" });
+                res.status(200).send({ message: 'Unidade eliminada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 

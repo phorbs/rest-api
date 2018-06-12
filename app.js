@@ -63,10 +63,6 @@ app.use('/prova', Prova);
 var Docente = require('./routes/Docente');
 app.use('/docente', Docente);
 
-//endpoint para codigobarra
-var CodigoBarra = require('./routes/CodigoBarra');
-app.use('/codigobarra', CodigoBarra);
-
 //endpoint para inscricao
 var Inscricao = require('./routes/Inscricao');
 app.use('/inscricao', Inscricao);

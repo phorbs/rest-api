@@ -20,13 +20,13 @@ router.post('/add', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('INSERT INTO provas SET ?', prova, function (err, result) {
-                if (err) return res.status(500).send("Erro ao registar");
-                res.status(200).send('Prova a ' + prova.data + ' registada');
+                if (err) return res.status(500).send({ message: "Erro ao registar" });
+                res.status(200).send({ message: 'Prova a ' + prova.data + ' registada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -36,13 +36,13 @@ router.get('/', VerifyToken, function (req, res) {
         var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular FROM provas INNER JOIN docentes ON provas.docentes_codigo=docentes.codigo INNER JOIN ucs ON provas.ucs_iduc = ucs.iduc ORDER BY provas.idprova desc';
         req.getConnection(function (error, conn) {
             conn.query(sql, function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -51,9 +51,9 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
             conn.query('select * from provas where idprova = ?', req.params.id, function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
-                    return res.status(404).send("Prova não encontrada");
+                    return res.status(404).send({ message: "Prova não encontrada" });
                 } else {
                     res.status(200).send(rows);
                 }
@@ -61,7 +61,7 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -80,13 +80,13 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('update provas set ? where idprova = ?', [prova, prova.iduc], function (err, result) {
-                if (err) return res.status(500).send("Erro ao registar");
-                res.status(200).send('Prova de ' + prova.data + ' atualizada');
+                if (err) return res.status(500).send({ message: "Erro ao registar" });
+                res.status(200).send({ message: 'Prova de ' + prova.data + ' atualizada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -98,13 +98,13 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('delete from provas where idprova = ?', prova.idprova, function (err, result) {
-                if (err) return res.status(500).send("Erro ao eliminar");
-                res.status(200).send('Unidade eliminada');
+                if (err) return res.status(500).send({ message: "Erro ao eliminar" });
+                res.status(200).send({ message: 'Unidade eliminada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 

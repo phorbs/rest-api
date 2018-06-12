@@ -6,31 +6,30 @@ router.use(bodyParser.json());
 
 var VerifyToken = require('./VerifyToken');
 
-//registar inscricao(implica criar um codigo de barras)
 router.post('/add', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var inscricao = {
-            alunos_codigo: req.body.codigo,
-            provas_idprova: req.body.idprova,
-            data: Date.now()
+            alunos_codigo: req.body.alunos_codigo,
+            provas_idprova: req.body.provas_idprova,
+            data: new Date().toLocaleDateString('ko-KR') // mysql apenas admite datas do formato Ymd que é adotado pelos paises asiaticos
         }
         req.getConnection(function (error, conn) {
             var sql = 'select * from inscricoes where alunos_codigo = ? and provas_idprova = ?';
             conn.query(sql, [inscricao.alunos_codigo, inscricao.provas_idprova], function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length > 0) {
-                    return res.status(404).send("Sistema não admite dupla inscrição à mesma prova");
+                    return res.status(403).send({ message: "Sistema não admite dupla inscrição à mesma prova" });
                 } else {
                     conn.query('INSERT INTO inscricoes SET ?', inscricao, function (err, result) {
-                        if (err) return res.status(500).send("Erro ao registar");
-                        res.status(200).send('Inscrição registada');
+                        if (err) return res.status(500).send({ message: "Erro ao registar" });
+                        res.status(200).send({ message: 'Inscrição registada' });
                     });
                 }
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -44,13 +43,13 @@ router.get('/', VerifyToken, function (req, res) {
         order by provas.data asc';
         req.getConnection(function (error, conn) {
             conn.query(sql, function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -65,9 +64,9 @@ router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
         where inscricoes.alunos_codigo = ? \
         order by provas.data asc';
             conn.query(sql, req.params.codigo, function (err, rows, fields) {
-                if (err) return res.status(500).send("Erro ao obter");
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
-                    return res.status(404).send("Inscrições não encontrada");
+                    return res.status(404).send({ message: "Inscrições não encontrada" });
                 } else {
                     res.status(200).send(rows);
                 }
@@ -75,7 +74,7 @@ router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 
@@ -87,13 +86,13 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
         }
         req.getConnection(function (error, conn) {
             conn.query('delete from inscricoes where idinscricao = ?', inscricao.idinscricao, function (err, result) {
-                if (err) return res.status(500).send("Erro ao eliminar");
-                res.status(200).send('Inscrição eliminada');
+                if (err) return res.status(500).send({ message: "Erro ao eliminar" });
+                res.status(200).send({ message: 'Inscrição eliminada' });
             });
         });
 
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 

@@ -106,37 +106,19 @@ CREATE TABLE IF NOT EXISTS `infopower_pt`.`inscricoes` (
   `idinscricao` INT NOT NULL AUTO_INCREMENT,
   `alunos_codigo` INT NOT NULL,
   `data` DATE NOT NULL,
-  PRIMARY KEY (`idinscricao`),
+  `provas_idprova` INT NOT NULL,
+  `presenca` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`idinscricao`, `provas_idprova`),
   INDEX `fk_inscricoes_alunos1_idx` (`alunos_codigo` ASC),
+  INDEX `fk_inscricoes_provas1_idx` (`provas_idprova` ASC),
   CONSTRAINT `fk_inscricoes_alunos1`
     FOREIGN KEY (`alunos_codigo`)
     REFERENCES `infopower_pt`.`alunos` (`codigo`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `infopower_pt`.`codigosbarras`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `infopower_pt`.`codigosbarras` ;
-
-CREATE TABLE IF NOT EXISTS `infopower_pt`.`codigosbarras` (
-  `idcodigobarra` INT NOT NULL AUTO_INCREMENT,
-  `numero` INT NULL,
-  `provas_idprova` INT NOT NULL,
-  `inscricoes_idinscricao` INT NOT NULL,
-  PRIMARY KEY (`idcodigobarra`, `provas_idprova`, `inscricoes_idinscricao`),
-  INDEX `fk_codigosbarras_provas1_idx` (`provas_idprova` ASC),
-  INDEX `fk_codigosbarras_inscricoes1_idx` (`inscricoes_idinscricao` ASC),
-  CONSTRAINT `fk_codigosbarras_provas1`
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_inscricoes_provas1`
     FOREIGN KEY (`provas_idprova`)
     REFERENCES `infopower_pt`.`provas` (`idprova`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_codigosbarras_inscricoes1`
-    FOREIGN KEY (`inscricoes_idinscricao`)
-    REFERENCES `infopower_pt`.`inscricoes` (`idinscricao`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

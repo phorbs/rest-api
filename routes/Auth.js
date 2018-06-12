@@ -23,12 +23,12 @@ router.post('/register', function (req, res, next) {
 
     req.getConnection(function (error, conn) {
         conn.query('select idutilizador from utilizadores where codigo = ?', user.codigo, function (err, rows) {
-            if (err) return res.status(500).send("Erro ao registar");
+            if (err) return res.status(500).send({ message: "Erro ao registar" });
             if (rows.length > 0) {
-                return res.status(409).send("Conflito de utilizador"); //numero escolar ja existe
+                return res.status(409).send({ message: "Conflito de utilizador" }); //numero escolar ja existe
             } else { //caso nao existir avançar com a inserção
                 conn.query('INSERT INTO utilizadores SET ?', user, function (err, result) {
-                    if (err) return res.status(500).send("Erro ao registar");
+                    if (err) return res.status(500).send({ message: "Erro ao registar" });
                     //token sign é o metodo que vai criar uma identificação unica ao user
                     var token = jwt.sign(
                         { id: result.insertId }, //id do objeto associado
@@ -52,7 +52,7 @@ router.get('/me', VerifyToken, function (req, res) {
     if (req.user.permisao === "A") {
         res.status(200).send(req.user);
     } else {
-        res.status(403).send('Não tem permissão para aceder a este serviço');
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
 

@@ -32,15 +32,15 @@ router.post('/login', function (req, res) {
         conn.query('select * from utilizadores where codigo=?', user.codigo, function (err, rows, fields) {
             if (err) {
                 //return res.status(500).send("Erro na bd: " + user.name + err.sqlMessage);
-                return res.status(500).send("Erro na bd");
+                return res.status(500).send({ message: "Erro na bd" });
             }
             if (rows.length <= 0) {
-                return res.status(404).send("Utilizador não encontrado")
+                return res.status(404).send({ message: "Utilizador não encontrado" })
             }
             var passwordIsValid = bcrypt.compareSync(user.password, rows[0].password);
 
             if (!passwordIsValid) {
-                return res.status(401).send({ auth: false, token: null });
+                return res.status(401).send({ message: 'Password incorrecta' });
             }
             var token = jwt.sign({ id: rows[0].idutilizador }, config.secret, {
                 expiresIn: 86400 // 24 horas
@@ -51,7 +51,7 @@ router.post('/login', function (req, res) {
             //utilizadores é uma entidade abstracta apenas para a autenticação
             conn.query('select * from docentes where codigo= ?', user.codigo, function (err, teacherRow) {
                 if (err) {
-                    return res.status(500).send("Erro na bd");
+                    return res.status(500).send({ message: "Erro na bd" });
                 }
                 if (teacherRow.length > 0) {
                     detailUser.nome = teacherRow[0].nome;
@@ -59,7 +59,7 @@ router.post('/login', function (req, res) {
                 } else {
                     conn.query('select * from alunos where codigo= ?', user.codigo, function (err, studentRow) {
                         if (err) {
-                            return res.status(500).send("Erro na bd");
+                            return res.status(500).send({ message: "Erro na bd" });
                         }
                         if (studentRow.length > 0) {
                             detailUser.nome = studentRow[0].nome;
