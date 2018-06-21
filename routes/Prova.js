@@ -30,11 +30,17 @@ router.post('/add', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista provas
+//obter lista provas inclusive as inscricoes e precensas
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
-        var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular FROM provas INNER JOIN docentes ON provas.docentes_codigo=docentes.codigo INNER JOIN ucs ON provas.ucs_iduc = ucs.iduc ORDER BY provas.idprova desc';
+        var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular,\
+        (select count(inscricoes.presenca) from inscricoes where inscricoes.provas_idprova = provas.idprova) as inscricoes,\
+        (select sum(inscricoes.presenca) from inscricoes where inscricoes.provas_idprova = provas.idprova) as presencas\
+        FROM provas \
+        inner JOIN docentes ON provas.docentes_codigo=docentes.codigo \
+        inner JOIN ucs ON provas.ucs_iduc = ucs.iduc'
         req.getConnection(function (error, conn) {
+            if (error) return res.status(500).send({ message: "Erro no servidor" });
             conn.query(sql, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
@@ -66,8 +72,8 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
 });
 
 //atualizar uma uc
-router.put('/edit/(:id)', function (req, res) {    
-    if (req.user.permisao === "D") {        
+router.put('/edit/(:id)', function (req, res) {
+    if (req.user.permisao === "D") {
         var prova = {
             idprova: req.params.id,
             tipo: req.body.tipo,
@@ -77,18 +83,18 @@ router.put('/edit/(:id)', function (req, res) {
             docentes_codigo: req.body.codigo,
             estado: req.body.estado
         }
-        
+
         req.getConnection(function (error, conn) {
-            if(error) console.log(error);
+            if (error) console.log(error);
             conn.query('update provas set ? where idprova = ' + prova.idprova, prova, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Prova de ' + prova.data + ' atualizada' });
             });
         });
 
-     } else {
+    } else {
         res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
-    } 
+    }
 });
 
 //eliminar uc
