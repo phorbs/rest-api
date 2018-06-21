@@ -49,6 +49,7 @@ router.post('/login', function (req, res) {
             detailUser.permisao = rows[0].permisao;
             //para obter o aluno ou docente
             //utilizadores é uma entidade abstracta apenas para a autenticação
+
             conn.query('select * from docentes where codigo= ?', user.codigo, function (err, teacherRow) {
                 if (err) {
                     return res.status(500).send({ message: "Erro na bd" });
@@ -56,6 +57,7 @@ router.post('/login', function (req, res) {
                 if (teacherRow.length > 0) {
                     detailUser.nome = teacherRow[0].nome;
                     detailUser.tipo = 'docente'
+                    res.status(200).send({ auth: true, token: token, user: detailUser });
                 } else {
                     conn.query('select * from alunos where codigo= ?', user.codigo, function (err, studentRow) {
                         if (err) {
@@ -69,6 +71,7 @@ router.post('/login', function (req, res) {
                     });
                 }
             });
+
         });
     });
 });

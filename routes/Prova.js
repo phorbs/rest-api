@@ -66,8 +66,8 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
 });
 
 //atualizar uma uc
-router.put('/edit/(:id)', VerifyToken, function (req, res) {
-    if (req.user.permisao === "D") {
+router.put('/edit/(:id)', function (req, res) {    
+    if (req.user.permisao === "D") {        
         var prova = {
             idprova: req.params.id,
             tipo: req.body.tipo,
@@ -75,19 +75,20 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
             sala: req.body.sala,
             lotacaoMaxima: req.body.lotacao,
             docentes_codigo: req.body.codigo,
-            estado: 0,
-            ucs_iduc: req.body.iduc
+            estado: req.body.estado
         }
+        
         req.getConnection(function (error, conn) {
-            conn.query('update provas set ? where idprova = ?', [prova, prova.iduc], function (err, result) {
+            if(error) console.log(error);
+            conn.query('update provas set ? where idprova = ' + prova.idprova, prova, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Prova de ' + prova.data + ' atualizada' });
             });
         });
 
-    } else {
+     } else {
         res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
-    }
+    } 
 });
 
 //eliminar uc

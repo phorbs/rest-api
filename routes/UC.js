@@ -66,7 +66,7 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
             unidadeCurricular: req.body.designacao
         }
         req.getConnection(function (error, conn) {
-            conn.query('update ucs set ? where iduc = ?', [uc, uc.iduc], function (err, result) {
+            conn.query('update ucs set ? where iduc = ' + uc.iduc, uc, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Unidade ' + uc.unidadeCurricular + ' atualizada' });
             });

@@ -53,17 +53,38 @@ router.get('/', VerifyToken, function (req, res) {
     }
 });
 
+//obter lista de inscricoes de um aluno\docente
+router.get('/(:codigo)', VerifyToken, function (req, res) {
+    if (req.user.permisao === "D" || req.user.permisao === "A") {
+        var sql = 'SELECT inscricoes.idinscricao, inscricoes.alunos_codigo, inscricoes.data, provas.data, inscricoes.provas_idprova, inscricoes.presenca, ucs.unidadeCurricular\
+        from inscricoes\
+        inner join provas on provas_idprova = provas.idprova\
+        inner join ucs on provas.ucs_iduc = ucs.iduc\
+        where inscricoes.alunos_codigo = ?\
+        order by provas.data asc';
+        req.getConnection(function (error, conn) {
+            conn.query(sql, req.params.codigo, function (err, rows, fields) {
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
+                res.status(200).send(rows);
+            });
+        });
+
+    } else {
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
+    }
+});
+//TODO: terminar esta parte
 //obter lista de inscrições
-router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
+router.get('/edit/(:idinscricao)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         req.getConnection(function (error, conn) {
             var sql = 'SELECT inscricoes.idinscricao, inscricoes.alunos_codigo, inscricoes.data, provas.data, inscricoes.provas_idprova, inscricoes.presenca, ucs.unidadeCurricular\
         from inscricoes\
         inner join provas on provas_idprova = provas.idprova\
         inner join ucs on provas.ucs_iduc = ucs.iduc\
-        where inscricoes.alunos_codigo = ? \
+        where inscricoes.idinscricao = ? \
         order by provas.data asc';
-            conn.query(sql, req.params.codigo, function (err, rows, fields) {
+            conn.query(sql, req.params.idinscricao, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
                     return res.status(404).send({ message: "Inscrições não encontrada" });

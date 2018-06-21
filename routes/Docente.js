@@ -67,7 +67,7 @@ router.put('/edit/(:codigo)', VerifyToken, function (req, res) {
             nome: req.body.nome
         }
         req.getConnection(function (error, conn) {
-            conn.query('update docentes set ? where codigo = ?', [docente, docente.codigo], function (err, result) {
+            conn.query('update docentes set ? where codigo = ' + docente.codigo,docente, function (err, result) {
                 if (err) return res.status(500).send("Erro ao registar");
                 res.status(200).send({ message: 'Docente ' + docente.nome + ' atualizada' });
             });
