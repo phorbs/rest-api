@@ -15,7 +15,7 @@ var config = {
     }, */
     server: {
         host: 'https://guarded-temple-64733.herokuapp.com/',
-        port: '8888'
+        port: process.env.PORT || 8080
     },
     secret: 'supersecret'
 }
