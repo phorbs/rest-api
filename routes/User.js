@@ -24,6 +24,9 @@ router.post('/login', function (req, res) {
     //atenção tenho de usar url encoded data para poder aceder aos parametros no request body
     if (user.codigo == undefined) return res.status(404).send("Numero indefinido");
     req.getConnection(function (error, conn) {
+        if (error) {            
+            return res.status(500).send({ message: error });
+        }
         //atenção de que a ligação em modo pool tenho de ter a preocupação de
         //responder com send para a ligação pool seja fechada
         //logo a partir do momento que esta esteja fechada,
