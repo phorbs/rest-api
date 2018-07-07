@@ -9,7 +9,14 @@ var bcrypt = require('bcryptjs');
 var config = require('../config');
 var VerifyToken = require('./VerifyToken');
 
-//routeamento para registar o user (passwords >= 6 caracteres)
+/**
+ * ENDPOINT: api/auth/register
+ * METHOD: post
+ * req.body: codigo e email
+ * 
+ * routeamento para registar o utilizador (passwords >= 6 caracteres)
+ * numa tabela abstracta (não tem fk, mas associações de lógica) chamada utilizadores
+ */
 router.post('/register', function (req, res, next) {
     //bcrypt para cifrar password
     var hashedPassword = bcrypt.hashSync(req.body.password, 6);
@@ -49,7 +56,13 @@ router.post('/register', function (req, res, next) {
 
 });
 
-//exemplo de permissão de acesso a endpoint
+/**
+ * ENDPOINT: api/auth/me
+ * METHOD: get
+ * 
+ * Não é utilizado no sistema é apenas para fim de testes
+ * exemplo de permissão de acesso a endpoint 
+ */
 router.get('/me', VerifyToken, function (req, res) {
     console.log(req.user.permisao);
     if (req.user.permisao === "A") {
@@ -59,7 +72,10 @@ router.get('/me', VerifyToken, function (req, res) {
     }
 });
 
-//não é necessário. apenas academico.
+/**
+ * ENDPOINT: api/auth/logout
+ * Não é utilizado no sistema é apenas para fim de testes
+ */
 router.get('/logout', function (req, res) {
     res.status(200).send({ auth: false, token: null });
 });

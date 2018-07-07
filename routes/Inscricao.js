@@ -6,6 +6,19 @@ router.use(bodyParser.json());
 
 var VerifyToken = require('./VerifyToken');
 
+/**
+ * ENDPOINT: /inscricao/add/
+ * METHOD: post
+ * req.body alunos_codigo e provas_idprova
+ * 
+ * criar uma inscrição
+ * primeiro verifica se o aluno já está inscrito na prova,
+ * caso seja verdade não permite uma nova inscrição.
+ * 
+ * Note que: a base de dados tem um trigger que não permite
+ * que seja realizado uma inserção de uma inscrição
+ * de uma prova que já expirou.
+ */
 router.post('/add', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var inscricao = {
@@ -33,7 +46,13 @@ router.post('/add', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista inscricoes
+/**
+ * ENDPOINT: /inscricao/
+ * METHOD: get
+ * 
+ * obter lista de inscricoes juntamente com as respetivas:
+ * unidades curriculares e provas ordenado por data
+ */
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var sql = 'SELECT inscricoes.idinscricao, inscricoes.alunos_codigo, inscricoes.data, provas.data, inscricoes.provas_idprova, inscricoes.presenca, ucs.unidadeCurricular\
@@ -56,7 +75,15 @@ router.get('/', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista de inscricoes de um aluno\docente
+/**
+ * ENDPOINT: /inscricao/(:codigo)
+ * METHOD: get
+ * req.params codigo
+ * 
+ * obter lista de inscricoes juntamente com as respetivas:
+ * unidades curriculares e provas com a permissa de que é
+ * só as inscricoes relacionados com o código fornecido.
+ */
 router.get('/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var sql = 'SELECT inscricoes.idinscricao, inscricoes.alunos_codigo, inscricoes.data, provas.data, inscricoes.provas_idprova, inscricoes.presenca, ucs.unidadeCurricular\
@@ -80,7 +107,15 @@ router.get('/(:codigo)', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista de inscrições
+/**
+ * ENDPOINT: /inscricao/edit/(:idinscricao)
+ * METHOD: get
+ * req.params idinscricao
+ * 
+ * obter uma inscricao juntamente com as respetivas:
+ * unidades curriculares e provas com a permissa de que é
+ * só as inscricoes relacionados com a inscrição fornecida.
+ */
 router.get('/edit/(:idinscricao)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         req.getConnection(function (error, conn) {
@@ -108,7 +143,13 @@ router.get('/edit/(:idinscricao)', VerifyToken, function (req, res) {
     }
 });
 
-//eliminar uc
+/**
+ * ENDPOINT: /inscricao/delete/(:id)
+ * METHOD: delete
+ * req.params id
+ * 
+ * eliminar inscricao
+ */
 router.delete('/delete/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var inscricao = {
@@ -129,7 +170,13 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
     }
 });
 
-//atualizar uma inscricao
+/**
+ * ENDPOINT: /inscricao/edit/(:id)
+ * METHOD: put
+ * req.params id
+ * 
+ * atualizar a presença na inscrição
+ */
 router.put('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var inscricao = {

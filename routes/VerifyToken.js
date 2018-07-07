@@ -1,7 +1,12 @@
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 
-//express middleware para verificar o token caso seja valido devolver os dados do utilizador
+/**
+ * express middleware para verificar o token caso seja valido devolver os dados do utilizador
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 function verifyToken(req, res, next) {
     var token = req.headers['x-access-token'];
     if (!token) return res.status(401).send({ auth: false, message: 'Não existe token associado' });

@@ -8,8 +8,14 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 var config = require('../config');
 
-//fazer login com recurso a numero escolar e password e atribuir um token para o cliente guardar o token
-//em session or local
+/**
+ * ENDPOINT: /user/login
+ * METHOD: post
+ * req.body codigo e password
+ * fazer login com recurso ao numero escolar e password,
+ * atribuir um token para o cliente e guardar o token
+ * em session ou local
+ */
 router.post('/login', function (req, res) {
     var user = {
         codigo: req.body.codigo,

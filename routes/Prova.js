@@ -6,7 +6,13 @@ router.use(bodyParser.json());
 
 var VerifyToken = require('./VerifyToken');
 
-//registar prova
+/**
+ * ENDPOINT: /prova/add
+ * METHOD: post
+ * req.body tipo, data, sala, lotacao, codigo, iduc
+ * 
+ * inserir prova
+ */
 router.post('/add', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var prova = {
@@ -33,7 +39,13 @@ router.post('/add', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista provas inclusive as inscricoes e precensas
+/**
+ * ENDPOINT: /prova/
+ * METHOD: get
+ * 
+ * obter lista provas juntamente com os docentes,
+ * unidades curriculares, soma das inscricoes e presenças
+ */
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular,\
@@ -55,7 +67,12 @@ router.get('/', VerifyToken, function (req, res) {
     }
 });
 
-//apenas obter a lista das provas ativas
+/**
+ * ENDPOINT: /prova/ativa
+ * METHOD: get
+ * 
+ * obter a lista das provas ativas
+ */
 router.get('/ativa', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular,\
@@ -78,7 +95,13 @@ router.get('/ativa', VerifyToken, function (req, res) {
     }
 });
 
-//apenas obter as provas não inscritas
+/**
+ * ENDPOINT: /prova/(:codigo)
+ * METHOD: get
+ * req.params codigo
+ * 
+ * obter a lista das provas não inscritas apenas do código fornecido
+ */
 router.get('/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "A") {
         var sql = 'select * from provas \
@@ -97,7 +120,13 @@ router.get('/(:codigo)', VerifyToken, function (req, res) {
     }
 });
 
-//obter uma prova
+/**
+ * ENDPOINT: /prova/edit/(:id)
+ * METHOD: get
+ * req.params id
+ * 
+ * obter uma prova
+ */
 router.get('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
@@ -119,7 +148,14 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
     }
 });
 
-//atualizar uma uc
+/**
+ * ENDPOINT: /prova/edit/(:id)
+ * METHOD: put
+ * req.params id
+ * req.body tipo, data, sala, lotacao, codigo, estado
+ * 
+ * atualizar a prova
+ */
 router.put('/edit/(:id)', VerifyToken, function (req, res) {
     if (!req.user) return res.status(401).send({ message: "Não autorizado" });
     if (req.user.permisao === "D") {
@@ -147,7 +183,13 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
     }
 });
 
-//eliminar uc
+/**
+ * ENDPOINT: /prova/delete/(:id)
+ * METHOD: delete
+ * req.params id
+ * 
+ * eliminar prova
+ */
 router.delete('/delete/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var prova = {

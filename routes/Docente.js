@@ -6,7 +6,13 @@ router.use(bodyParser.json());
 
 var VerifyToken = require('./VerifyToken');
 
-//registar docente
+/**
+ * ENDPOINT: /docente/add
+ * METHOD: post
+ * req.body codigo e nome
+ * 
+ * registar docente
+ */
 router.post('/add', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var docente = {
@@ -28,7 +34,12 @@ router.post('/add', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista docentes
+/**
+ * ENDPOINT: /docente/
+ * METHOD: get
+ * 
+ * obter lista docentes
+ */
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
@@ -46,7 +57,14 @@ router.get('/', VerifyToken, function (req, res) {
     }
 });
 
-//obter um docente
+
+/**
+ * ENDPOINT: /docente/edit/(:codigo)
+ * METHOD: get
+ * req.params codigo
+ * 
+ * obter docente em função do codigo
+ */
 router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
@@ -68,7 +86,14 @@ router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
     }
 });
 
-//atualizar um docente
+/**
+ * ENDPOINT: /docente/edit/(:codigo)
+ * METHOD: put
+ * req.params codigo
+ * req.body nome
+ * 
+ * atualizar o docente em função do código
+ */
 router.put('/edit/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var docente = {
@@ -90,7 +115,13 @@ router.put('/edit/(:codigo)', VerifyToken, function (req, res) {
     }
 });
 
-//eliminar docente
+/**
+ * ENDPOINT: /docente/delete/(:codigo)
+ * METHOD: delete
+ * req.params codigo
+ * 
+ * eliminar docente em função do código
+ */
 router.delete('/delete/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var docente = {

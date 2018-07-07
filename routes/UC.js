@@ -6,7 +6,13 @@ router.use(bodyParser.json());
 
 var VerifyToken = require('./VerifyToken');
 
-//registar uc
+/**
+ * ENDPOINT: /uc/add/
+ * METHOD: post
+ * req.body designacao
+ * 
+ * criar uma unidade curricular
+ */
 router.post('/add', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var uc = {
@@ -27,7 +33,12 @@ router.post('/add', VerifyToken, function (req, res) {
     }
 });
 
-//obter lista uc
+/**
+ * ENDPOINT: /uc/
+ * METHOD: get
+ * 
+ * obter lista de unidades curriculares
+ */
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
@@ -45,7 +56,13 @@ router.get('/', VerifyToken, function (req, res) {
     }
 });
 
-//obter uma uc
+/**
+ * ENDPOINT: /uc/edit/(:id)
+ * METHOD: get
+ * req.params id
+ * 
+ * obter uma uc em função do id
+ */
 router.get('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
@@ -67,7 +84,14 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
     }
 });
 
-//atualizar uma uc
+/**
+ * ENDPOINT: /uc/edit/(:id)
+ * METHOD: put
+ * req.params id
+ * req.body designacao
+ * 
+ * atualizar uma unidade curricular em função do id
+ */
 router.put('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var uc = {
@@ -89,7 +113,13 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
     }
 });
 
-//eliminar uc
+/**
+ * ENDPOINT: /uc/delete/(:id)
+ * METHOD: delete
+ * req.params id
+ * 
+ * eliminar unidade curricular em função do id
+ */
 router.delete('/delete/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var uc = {
