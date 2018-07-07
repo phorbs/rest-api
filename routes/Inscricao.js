@@ -21,7 +21,7 @@ router.post('/add', VerifyToken, function (req, res) {
                     return res.status(403).send({ message: "Sistema não admite dupla inscrição à mesma prova" });
                 } else {
                     conn.query('INSERT INTO inscricoes SET ?', inscricao, function (err, result) {
-                        if (err) return res.status(500).send({ message: "Erro ao registar" });
+                        if (err) return res.status(500).send({ message: err.message });
                         res.status(200).send({ message: 'Inscrição registada' });
                     });
                 }
@@ -133,7 +133,7 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
 router.put('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var inscricao = {
-			presenca:1,
+            presenca: 1,
         }
         req.getConnection(function (error, conn) {
             if (error) {
