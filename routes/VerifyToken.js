@@ -9,6 +9,9 @@ function verifyToken(req, res, next) {
     jwt.verify(token, config.secret, function (err, decoded) {
         if (err) return res.status(500).send({ auth: false, message: 'Não foi possivel autenticar' });
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('SELECT * FROM utilizadores WHERE idutilizador = ' + decoded.id, function (err, rows, fields) {
                 if (err) {
                     return res.status(500).send({ message: "erro na bd" });

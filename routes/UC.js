@@ -13,6 +13,9 @@ router.post('/add', VerifyToken, function (req, res) {
             unidadeCurricular: req.body.designacao
         }
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('INSERT INTO ucs SET ?', uc, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Unidade ' + uc.unidadeCurricular + ' registada' });
@@ -28,6 +31,9 @@ router.post('/add', VerifyToken, function (req, res) {
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('select * from ucs order by iduc desc', function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
@@ -43,6 +49,9 @@ router.get('/', VerifyToken, function (req, res) {
 router.get('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('select * from ucs where iduc = ?', req.params.id, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
@@ -66,6 +75,9 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
             unidadeCurricular: req.body.designacao
         }
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('update ucs set ? where iduc = ' + uc.iduc, uc, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Unidade ' + uc.unidadeCurricular + ' atualizada' });
@@ -84,6 +96,9 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
             iduc: req.params.id
         }
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('delete from ucs where iduc = ?', uc.iduc, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao eliminar" });
                 res.status(200).send({ message: 'Unidade eliminada' });

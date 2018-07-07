@@ -22,6 +22,9 @@ router.post('/register', function (req, res, next) {
     };
 
     req.getConnection(function (error, conn) {
+        if (error) {
+            return res.status(500).send({ message: "erro na bd" });
+        }
         conn.query('select idutilizador from utilizadores where codigo = ?', user.codigo, function (err, rows) {
             if (err) return res.status(500).send({ message: "Erro ao registar" });
             if (rows.length > 0) {

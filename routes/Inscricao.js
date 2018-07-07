@@ -42,6 +42,9 @@ router.get('/', VerifyToken, function (req, res) {
         inner join ucs on provas.ucs_iduc = ucs.iduc\
         order by provas.data asc';
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query(sql, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
@@ -63,6 +66,9 @@ router.get('/(:codigo)', VerifyToken, function (req, res) {
         where inscricoes.alunos_codigo = ?\
         order by provas.data asc';
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query(sql, req.params.codigo, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
@@ -73,11 +79,14 @@ router.get('/(:codigo)', VerifyToken, function (req, res) {
         res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
-//TODO: terminar esta parte
+
 //obter lista de inscrições
 router.get('/edit/(:idinscricao)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             var sql = 'SELECT inscricoes.idinscricao, inscricoes.alunos_codigo, inscricoes.data, provas.data, inscricoes.provas_idprova, inscricoes.presenca, ucs.unidadeCurricular\
         from inscricoes\
         inner join provas on provas_idprova = provas.idprova\
@@ -106,9 +115,37 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
             idinscricao: req.params.id
         }
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('delete from inscricoes where idinscricao = ?', inscricao.idinscricao, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao eliminar" });
                 res.status(200).send({ message: 'Inscrição eliminada' });
+            });
+        });
+
+    } else {
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
+    }
+});
+
+//atualizar uma inscricao
+router.put('/edit/(:id)', VerifyToken, function (req, res) {
+    if (req.user.permisao === "D") {
+        var inscricao = {
+            idinscricao: req.params.id,
+        }
+        req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
+            conn.query('update inscricoes set ? where idinscricao = ?', [inscricao, inscricao.idinscricao], function (err, result) {
+                if (err) return res.status(500).send({ message: "Erro ao validar presença" });
+                let sql = 'SELECT idinscricao, alunos_codigo, alunos.nome FROM inscricoes INNER JOIN alunos ON alunos.codigo = inscricoes.alunos_codigo where idinscricao =' + inscricao.idinscricao
+                conn.query(sql, function (err, result) {
+                    if (err) return res.status(500).send({ message: "Erro ao validar presença" });
+                    res.status(200).send({ message: 'Presença validada!', aluno: result });
+                });
             });
         });
 

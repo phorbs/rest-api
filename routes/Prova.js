@@ -19,6 +19,9 @@ router.post('/add', VerifyToken, function (req, res) {
             ucs_iduc: req.body.iduc
         }
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('INSERT INTO provas SET ?', prova, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Prova a ' + prova.data + ' registada' });
@@ -56,6 +59,9 @@ router.get('/', VerifyToken, function (req, res) {
 router.get('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('select * from provas where idprova = ?', req.params.id, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
@@ -85,7 +91,9 @@ router.put('/edit/(:id)', function (req, res) {
         }
 
         req.getConnection(function (error, conn) {
-            if (error) console.log(error);
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('update provas set ? where idprova = ' + prova.idprova, prova, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Prova de ' + prova.data + ' atualizada' });
@@ -104,6 +112,9 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
             idprova: req.params.id
         }
         req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
             conn.query('delete from provas where idprova = ?', prova.idprova, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao eliminar" });
                 res.status(200).send({ message: 'Unidade eliminada' });
