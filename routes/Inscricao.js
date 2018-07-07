@@ -133,15 +133,15 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
 router.put('/edit/(:id)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D") {
         var inscricao = {
-            idinscricao: req.params.id,
+			presenca:1,
         }
         req.getConnection(function (error, conn) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
             }
-            conn.query('update inscricoes set ? where idinscricao = ?', [inscricao, inscricao.idinscricao], function (err, result) {
+            conn.query('update inscricoes set ? where idinscricao = ?', [inscricao, req.params.id], function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao validar presença" });
-                let sql = 'SELECT idinscricao, alunos_codigo, alunos.nome FROM inscricoes INNER JOIN alunos ON alunos.codigo = inscricoes.alunos_codigo where idinscricao =' + inscricao.idinscricao
+                let sql = 'SELECT idinscricao, alunos_codigo, alunos.nome FROM inscricoes INNER JOIN alunos ON alunos.codigo = inscricoes.alunos_codigo where idinscricao =' + req.params.id
                 conn.query(sql, function (err, result) {
                     if (err) return res.status(500).send({ message: "Erro ao validar presença" });
                     res.status(200).send({ message: 'Presença validada!', aluno: result });
