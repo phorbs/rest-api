@@ -63,6 +63,10 @@ app.use('/prova', Prova);
 var Docente = require('./routes/Docente');
 app.use('/docente', Docente);
 
+//endpoint para alunos
+var Aluno = require('./routes/Aluno');
+app.use('/aluno', Aluno);
+
 //endpoint para inscricao
 var Inscricao = require('./routes/Inscricao');
 app.use('/inscricao', Inscricao);

@@ -7,25 +7,26 @@ router.use(bodyParser.json());
 var VerifyToken = require('./VerifyToken');
 
 /**
- * ENDPOINT: /docente/add
+ * ENDPOINT: /aluno/add
  * METHOD: post
- * req.body codigo e nome
+ * req.body codigo e nome e curso
  * 
- * registar docente
+ * registar aluno
  */
 router.post('/add', VerifyToken, function (req, res) {
     if (req.user.permisao === "EH") {
-        var docente = {
+        var aluno = {
             codigo: req.body.codigo,
-            nome: req.body.nome
+            nome: req.body.nome,
+            curso: req.body.curso
         }
         req.getConnection(function (error, conn) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
             }
-            conn.query('INSERT INTO docentes SET ?', docente, function (err, result) {
+            conn.query('INSERT INTO alunos SET ?', aluno, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
-                res.status(200).send({ message: 'Docente ' + docente.nome + ' registado' });
+                res.status(200).send({ message: 'Aluno ' + aluno.nome + ' registado' });
             });
         });
 
@@ -35,10 +36,10 @@ router.post('/add', VerifyToken, function (req, res) {
 });
 
 /**
- * ENDPOINT: /docente/
+ * ENDPOINT: /aluno/
  * METHOD: get
  * 
- * obter lista docentes
+ * obter lista alunos
  */
 router.get('/', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "EH") {
@@ -46,7 +47,7 @@ router.get('/', VerifyToken, function (req, res) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
             }
-            conn.query('select * from docentes order by codigo desc', function (err, rows, fields) {
+            conn.query('select * from alunos order by codigo desc', function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 res.status(200).send(rows);
             });
@@ -59,11 +60,11 @@ router.get('/', VerifyToken, function (req, res) {
 
 
 /**
- * ENDPOINT: /docente/edit/(:codigo)
+ * ENDPOINT: /aluno/edit/(:codigo)
  * METHOD: get
  * req.params codigo
  * 
- * obter docente em função do codigo
+ * obter aluno em função do codigo
  */
 router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "EH") {
@@ -71,10 +72,10 @@ router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
             }
-            conn.query('select * from docentes where codigo = ?', req.params.codigo, function (err, rows, fields) {
+            conn.query('select * from alunos where codigo = ?', req.params.codigo, function (err, rows, fields) {
                 if (err) return res.status(500).send({ message: "Erro ao obter" });
                 if (rows.length <= 0) {
-                    return res.status(404).send({ message: "Docente não encontrado" });
+                    return res.status(404).send({ message: "Aluno não encontrado" });
                 } else {
                     res.status(200).send(rows);
                 }
@@ -87,26 +88,27 @@ router.get('/edit/(:codigo)', VerifyToken, function (req, res) {
 });
 
 /**
- * ENDPOINT: /docente/edit/(:codigo)
+ * ENDPOINT: /aluno/edit/(:codigo)
  * METHOD: put
  * req.params codigo
  * req.body nome
  * 
- * atualizar o docente em função do código
+ * atualizar o aluno em função do código
  */
 router.put('/edit/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "EH") {
-        var docente = {
+        var aluno = {
             codigo: req.params.codigo,
-            nome: req.body.nome
+            nome: req.body.nome,
+            curso: req.body.curso
         }
         req.getConnection(function (error, conn) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
             }
-            conn.query('update docentes set ? where codigo = ' + docente.codigo, docente, function (err, result) {
+            conn.query('update alunos set ? where codigo = ' + aluno.codigo, aluno, function (err, result) {
                 if (err) return res.status(500).send("Erro ao registar");
-                res.status(200).send({ message: 'Docente ' + docente.nome + ' atualizada' });
+                res.status(200).send({ message: 'Aluno ' + aluno.nome + ' atualizada' });
             });
         });
 
@@ -116,24 +118,24 @@ router.put('/edit/(:codigo)', VerifyToken, function (req, res) {
 });
 
 /**
- * ENDPOINT: /docente/delete/(:codigo)
+ * ENDPOINT: /aluno/delete/(:codigo)
  * METHOD: delete
  * req.params codigo
  * 
- * eliminar docente em função do código
+ * eliminar aluno em função do código
  */
 router.delete('/delete/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "EH") {
-        var docente = {
+        var aluno = {
             codigo: req.params.codigo
         }
         req.getConnection(function (error, conn) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
             }
-            conn.query('delete from docentes where codigo = ?', docente.codigo, function (err, result) {
+            conn.query('delete from alunos where codigo = ?', aluno.codigo, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao eliminar" });
-                res.status(200).send({ message: 'Docente eliminado' });
+                res.status(200).send({ message: 'Aluno eliminado' });
             });
         });
 
