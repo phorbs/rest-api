@@ -21,7 +21,7 @@ router.post('/add', VerifyToken, function (req, res) {
             sala: req.body.sala,
             lotacaoMaxima: req.body.lotacao,
             docentes_codigo: req.body.codigo,
-            estado: 0,
+            estado: 1,
             ucs_iduc: req.body.iduc
         }
         req.getConnection(function (error, conn) {
@@ -175,6 +175,37 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
             conn.query('update provas set ? where idprova = ' + prova.idprova, prova, function (err, result) {
                 if (err) return res.status(500).send({ message: "Erro ao registar" });
                 res.status(200).send({ message: 'Prova de ' + prova.data + ' atualizada' });
+            });
+        });
+
+    } else {
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
+    }
+});
+
+/**
+ * ENDPOINT: /prova/doc=(:codigo)
+ * METHOD: get
+ * req.params codigo
+ * 
+ * obter provas juntamento com os docentes e unidades curriculares
+ * em funcao do codigo.
+ */
+router.get('/doc=(:codigo)', VerifyToken, function (req, res) {
+    if (req.user.permisao === "D" || req.user.permisao === "A") {
+        var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular,\
+        (select count(inscricoes.presenca) from inscricoes where inscricoes.provas_idprova = provas.idprova) as inscricoes,\
+        (select sum(inscricoes.presenca) from inscricoes where inscricoes.provas_idprova = provas.idprova) as presencas\
+        FROM provas \
+        inner JOIN docentes ON provas.docentes_codigo=docentes.codigo \
+        inner JOIN ucs ON provas.ucs_iduc = ucs.iduc\
+        where provas.docentes_codigo =' + req.params.codigo;
+
+        req.getConnection(function (error, conn) {
+            if (error) return res.status(500).send({ message: "Erro no servidor" });
+            conn.query(sql, function (err, rows, fields) {
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
+                res.status(200).send(rows);
             });
         });
 

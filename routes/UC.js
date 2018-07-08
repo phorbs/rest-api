@@ -121,7 +121,7 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
  * eliminar unidade curricular em função do id
  */
 router.delete('/delete/(:id)', VerifyToken, function (req, res) {
-    if (req.user.permisao === "D") {
+    if (req.user.permisao === "EH") {
         var uc = {
             iduc: req.params.id
         }

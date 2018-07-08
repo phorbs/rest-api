@@ -170,6 +170,58 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
     }
 });
 
+
+/**
+ * ENDPOINT: /inscricao/frequencias/(:codigo)
+ * METHOD: get
+ * req.params codigo
+ * 
+ * obter lista de frequencias
+ */
+router.get('/frequencias/(:codigo)', VerifyToken, function (req, res) {
+    if (req.user.permisao === "D") {
+        req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
+            var sql = 'SELECT a.nome, a.codigo FROM inscricoes i\
+            , alunos a WHERE i.alunos_codigo = a.codigo AND\
+             presenca = 1 AND i.provas_idprova = ?';
+
+            conn.query(sql, req.params.codigo, function (err, rows, fields) {
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
+                if (rows.length <= 0) {
+                    return res.status(404).send({ message: "Inscrições não encontrada" });
+                } else {
+                    res.status(200).send(rows);
+                }
+            });
+        });
+    } else if (req.user.permisao === "A") {
+        //Buscar todas as disciplinas que o aluno tem a inscrição validada 
+        req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
+            var sql = 'SELECT * FROM infopower_pt.inscricoes i, infopower_pt.ucs u,\
+             infopower_pt.provas p WHERE i.provas_idprova = p.idprova AND \
+             u.iduc = p.ucs_iduc AND i.presenca = 1 AND i.alunos_codigo=?';
+
+            conn.query(sql, req.params.codigo, function (err, rows, fields) {
+
+                if (err) return res.status(500).send({ message: "Erro ao obter" });
+                if (rows.length <= 0) {
+                    return res.status(404).send({ message: "Inscrições não encontrada" });
+                } else {
+                    res.status(200).send(rows);
+                }
+            });
+        });
+    } else {
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
+    }
+});
+
 /**
  * ENDPOINT: /inscricao/edit/(:id)
  * METHOD: put
