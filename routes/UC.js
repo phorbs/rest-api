@@ -14,7 +14,7 @@ var VerifyToken = require('./VerifyToken');
  * criar uma unidade curricular
  */
 router.post('/add', VerifyToken, function (req, res) {
-    if (req.user.permisao === "D") {
+    if (req.user.permisao === "EH") {
         var uc = {
             unidadeCurricular: req.body.designacao
         }
@@ -40,7 +40,7 @@ router.post('/add', VerifyToken, function (req, res) {
  * obter lista de unidades curriculares
  */
 router.get('/', VerifyToken, function (req, res) {
-    if (req.user.permisao === "D") {
+    if (req.user.permisao === "D" || req.user.permisao === "EH") {
         req.getConnection(function (error, conn) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
@@ -64,7 +64,7 @@ router.get('/', VerifyToken, function (req, res) {
  * obter uma uc em função do id
  */
 router.get('/edit/(:id)', VerifyToken, function (req, res) {
-    if (req.user.permisao === "D") {
+    if (req.user.permisao === "EH") {
         req.getConnection(function (error, conn) {
             if (error) {
                 return res.status(500).send({ message: "erro na bd" });
@@ -93,7 +93,7 @@ router.get('/edit/(:id)', VerifyToken, function (req, res) {
  * atualizar uma unidade curricular em função do id
  */
 router.put('/edit/(:id)', VerifyToken, function (req, res) {
-    if (req.user.permisao === "D") {
+    if (req.user.permisao === "EH") {
         var uc = {
             iduc: req.params.id,
             unidadeCurricular: req.body.designacao

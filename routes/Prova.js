@@ -184,14 +184,14 @@ router.put('/edit/(:id)', VerifyToken, function (req, res) {
 });
 
 /**
- * ENDPOINT: /prova/doc=(:codigo)
+ * ENDPOINT: /prova/doc/(:codigo)
  * METHOD: get
  * req.params codigo
  * 
  * obter provas juntamento com os docentes e unidades curriculares
  * em funcao do codigo.
  */
-router.get('/doc=(:codigo)', VerifyToken, function (req, res) {
+router.get('/doc/(:codigo)', VerifyToken, function (req, res) {
     if (req.user.permisao === "D" || req.user.permisao === "A") {
         var sql = 'SELECT provas.idprova, provas.tipo, provas.data, provas.sala, provas.lotacaoMaxima, provas.estado, docentes.nome, ucs.unidadeCurricular,\
         (select count(inscricoes.presenca) from inscricoes where inscricoes.provas_idprova = provas.idprova) as inscricoes,\
@@ -240,5 +240,64 @@ router.delete('/delete/(:id)', VerifyToken, function (req, res) {
         res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
     }
 });
+
+/**
+ * ENDPOINT: /prova/desativa/(:id)
+ * METHOD: put
+ * req.params id
+ * 
+ * desativar prova
+ */
+router.put('/desativa/(:id)', VerifyToken, function (req, res) {
+    if (!req.user) return res.status(401).send({ message: "Não autorizado" });
+    if (req.user.permisao === "D") {
+        var prova = {
+            estado: 0
+        }
+        req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
+            var  sql = 'update provas set ? where idprova = ' + req.params.id + ' and docentes_codigo = ' + req.user.codigo;
+            conn.query(sql, prova, function (err, result) {
+                if (err) return res.status(500).send({ message: "Erro ao registar" });
+                res.status(200).send({ message: 'Esta prova não aceitará mais incrições.' });
+            });
+        });
+
+    } else {
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
+    }
+});
+
+/**
+ * ENDPOINT: /prova/ativar/(:id)
+ * METHOD: put
+ * req.params id
+ * 
+ * ativar prova
+ */
+router.put('/ativar/(:id)', VerifyToken, function (req, res) {
+    if (!req.user) return res.status(401).send({ message: "Não autorizado" });
+    if (req.user.permisao === "D") {
+        var prova = {
+            estado: 1
+        }
+        req.getConnection(function (error, conn) {
+            if (error) {
+                return res.status(500).send({ message: "erro na bd" });
+            }
+            var  sql = 'update provas set ? where idprova = ' + req.params.id + ' and docentes_codigo = ' + req.user.codigo;
+            conn.query(sql, prova, function (err, result) {
+                if (err) return res.status(500).send({ message: "Erro ao registar" });
+                res.status(200).send({ message: 'A prova foi novamente ativada.' });
+            });
+        });
+
+    } else {
+        res.status(403).send({ message: 'Não tem permissão para aceder a este serviço' });
+    }
+});
+
 
 module.exports = router;
